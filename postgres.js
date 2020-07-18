@@ -1,16 +1,3 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const app = express()
-const port = 3000
-
-app.use(bodyParser.json())
-app.use(
-    bodyParser.urlencoded({
-        extended: true,
-    })
-)
-
-
 const Pool = require('pg').Pool
 const pool = new Pool({
     user: 'me',
@@ -20,34 +7,72 @@ const pool = new Pool({
     port: 5432,
 })
 
-const getUsers = (request, response) => {
-    pool.query('SELECT * FROM users ORDER BY id ASC', (error, results) => {
-        if (error) {
-            throw error
+const push = async (element) => {
+    try {
+        const result = await check_table()
+
+        if (result.rows[0].exists) {
+            return await insert(element)
+        } else {
+            create_table()
         }
-        response.status(200).json(results.rows)
+    } catch (err) {
+        return err
+    }
+}
+const pop = () => {
+    return new Promise((resolve, reject) => {
+        pool.query('SELECT * FROM stack order by id desc limit 1', (err, results) => {
+            try{
+                if (err) {
+                    reject(err)
+                } else {
+                    pool.query(`delete from stack where id =${results.rows[0].id};`, (err, results2) => {
+                        if (err) {
+                            reject(err)
+                        } else {
+                            resolve(results.rows[0].element)
+                        }
+                    })
+                }
+            }catch(err){
+                reject(Error("No element left"))
+            }
+        })
     })
 }
-const createUser = (request, response) => {
-    const { name, email } = request.body
 
-    pool.query('INSERT INTO users (name, email) VALUES ($1, $2)', [name, email], (error, results) => {
-        if (error) {
-            throw error
-        }
-        response.status(201).send(`User added with ID: ${result.insertId}`)
+const create_table = async () => {
+    return new Promise((resolve, reject) => {
+        pool.query(`CREATE TABLE stack(ID SERIAL PRIMARY KEY,element VARCHAR(30));`, (err, result) => {
+            if (err) {
+                reject(true)
+            } else {
+                resolve(result)
+            }
+        })
     })
 }
-
-
-app.get('/', (request, response) => {
-    response.json({ info: 'Node.js, Express, and Postgres API' })
-})
-
-app.get('/users', getUsers)
-app.post('/users', createUser)
-
-app.listen(port, () => {
-    console.log(`App running on port ${port}.`)
-})
-
+const check_table = async () => {
+    return new Promise((resolve, reject) => {
+        pool.query("SELECT EXISTS (SELECT * FROM pg_tables where schemaname='public' and tablename='stack');", async (err, result) => {
+            if (err) {
+                reject(true)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+const insert = async (element) => {
+    return new Promise((resolve, reject) => {
+        pool.query(`INSERT INTO stack(element) values(${element});`, (err, result) => {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}
+module.exports = { push, pop, insert }

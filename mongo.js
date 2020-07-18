@@ -1,5 +1,4 @@
 const MongoClient = require('mongodb').MongoClient
-const marked = require('marked')
 
 const mongoURL = process.env.MONGO_URL || 'mongodb://localhost:27017/dev'
 
@@ -28,7 +27,7 @@ async function push(db, element) {
 }
 
 async function pop(db) {
-  return await db.findOneAndDelete({},{ "sort": { "_id": -1 } })
+  return await db.findOneAndDelete({}, { "sort": { "_id": -1 } })
 }
 
-module.exports = {initMongo,push,pop}
+module.exports = { initMongo, push, pop }
