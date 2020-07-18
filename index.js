@@ -1,58 +1,54 @@
-const path = require('path')
 const express = require('express')
-const MongoClient = require('mongodb').MongoClient
-const multer = require('multer')
-const marked = require('marked')
+const bodyParser = require('body-parser')
+
+const mongoDb = require('./mongo')
 
 const app = express()
+app.use(bodyParser());
 const port = process.env.PORT || 3000
-const mongoURL = process.env.MONGO_URL || 'mongodb://localhost:27017/dev'
 
-async function initMongo() {
-  console.log('Initialising MongoDB...')
-  let success = false
-  while (!success) {
-    try {
-      client = await MongoClient.connect(mongoURL, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
-      success = true
-    } catch {
-      console.log('Error connecting to MongoDB, retrying in 1 second')
-      await new Promise(resolve => setTimeout(resolve, 1000))
-    }
-  }
-  console.log('MongoDB initialised')
-  return client.db(client.s.options.dbName).collection('notes')
-}
 
-async function start() {
-  const db = await initMongo()
-
-  app.set('view engine', 'pug')
-  app.set('views', path.join(__dirname, 'views'))
-  app.use(express.static(path.join(__dirname, 'public')))
+async function start_server() {
+  const db = await mongoDb.initMongo()
 
   app.get('/', async (req, res) => {
-    res.render('index', { notes: await retrieveNotes(db) })
+    res.status(200).send({message:"hello server running"})
   })
 
   app.post(
-    '/note',
-    multer({ dest: path.join(__dirname, 'public/uploads/') }).single('image'),
-    async (req, res) => {
-      if (!req.body.upload && req.body.description) {
-        await saveNote(db, { description: req.body.description })
-        res.redirect('/')
-      } else if (req.body.upload && req.file) {
-        const link = `/uploads/${encodeURIComponent(req.file.filename)}`
-        res.render('index', {
-          content: `${req.body.description} ![](${link})`,
-          notes: await retrieveNotes(db),
-        })
-      }
-    },
+    '/push',async (req, res) => {
+        try{
+            const db_name = req.body.db_name
+            const element = req.body.element
+            if(db_name && element){
+                if(db_name==="mongo"){
+                    const insert_result = await mongoDb.push(db,{element})
+                    res.status(200).send({"insertedId":insert_result.insertedId})
+                }else{
+                    throw Error("Invalid db")
+                }
+            }else{
+                res.status(400).send({"err":"Invalid input in body"})
+            }
+        }catch(err){
+            res.status(400).send({"err":err.message})
+        }
+    }
+  )
+  app.delete(
+    '/pop',async (req, res) => {
+        const db_name = req.body.db_name
+            if(db_name){
+                if(db_name==="mongo"){
+                    const pop_result = await mongoDb.pop(db)
+                    res.status(200).send({"pop_element":pop_result.value})
+                }else{
+                    throw Error("Invalid db")
+                }
+            }else{
+                res.status(400).send({"err":"Invalid input in body"})
+            }
+    }
   )
 
   app.listen(port, () => {
@@ -60,15 +56,4 @@ async function start() {
   })
 }
 
-async function saveNote(db, note) {
-  await db.insertOne(note)
-}
-
-async function retrieveNotes(db) {
-  const notes = (await db.find().toArray()).reverse()
-  return notes.map(it => {
-    return { ...it, description: marked(it.description) }
-  })
-}
-
-start()
+start_server()
