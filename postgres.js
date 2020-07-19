@@ -1,10 +1,10 @@
 const Pool = require('pg').Pool
 const pool = new Pool({
-    user: 'me',
-    host: 'localhost',
-    database: 'api',
-    password: 'password',
-    port: 5432,
+    user: 'demopostgresadmin',
+    host: '10.104.108.185',
+    database: 'demopostgresdb',
+    password: 'demopostgrespwd',
+    port: 5432
 })
 
 const push = async (element) => {
@@ -17,7 +17,7 @@ const push = async (element) => {
             create_table()
         }
     }catch(err){
-        return err
+        throw err
     }
 }
 const pop = () => {
