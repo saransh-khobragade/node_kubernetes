@@ -19,7 +19,25 @@ POP API
         "db_name":"postgres"
     }'
 
-USEFULL commands
+
+Run Kubernetes follow these commannd
+
+    docker login
+    docker build . -t saransh98/lifo:1.0.5
+    docker tag lifo saransh98/lifo:1.0.5
+    docker push saransh98/lifo:1.0.5
+    minikube start
+    kubectl apply -f lifo && minikube dashboard
+
+    (Pick postgres service IP and edit lifo deployment env variable HOST, then wait for deployment to get green)
+
+    minikube service lifo
+
+    (Take port and use curl)
+
+
+
+Extra usefull commands
 
     docker 
 
