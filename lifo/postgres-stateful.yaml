@@ -31,7 +31,6 @@ spec:
       name: postgredb
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      storageClassName: gp2
       resources:
         requests:
-          storage: 3Gi
+          storage: 256Mi
