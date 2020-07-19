@@ -8,7 +8,7 @@ const pool = new Pool({
 })
 
 const push = async (element) => {
-    try {
+    try{
         const result = await check_table()
 
         if (result.rows[0].exists) {
@@ -16,7 +16,7 @@ const push = async (element) => {
         } else {
             create_table()
         }
-    } catch (err) {
+    }catch(err){
         return err
     }
 }
@@ -57,7 +57,7 @@ const check_table = async () => {
     return new Promise((resolve, reject) => {
         pool.query("SELECT EXISTS (SELECT * FROM pg_tables where schemaname='public' and tablename='stack');", async (err, result) => {
             if (err) {
-                reject(true)
+                reject(err)
             } else {
                 resolve(result)
             }
