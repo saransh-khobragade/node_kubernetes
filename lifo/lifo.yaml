@@ -33,5 +33,5 @@ spec:
             - name: MONGO_URL
               value: mongodb://mongo:27017/dev
             - name: HOST
-              value: '10.101.59.116'
+              value: '10.108.80.55'
           imagePullPolicy: Always
