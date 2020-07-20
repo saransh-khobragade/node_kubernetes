@@ -23,23 +23,23 @@ POP API
 Run Kubernetes follow these commannd
 
     docker login
-    docker build . -t saransh98/lifo:1.0.5
-    docker tag lifo saransh98/lifo:1.0.5
-    docker push saransh98/lifo:1.0.5
+
+    docker build -t lifo .
+    docker tag lifo saransh98/lifo:1.0.6
+    docker push saransh98/lifo:1.0.6
     minikube start
     kubectl apply -f lifo && minikube dashboard
-
-    (Pick postgres service IP and edit lifo deployment env variable HOST, then wait for deployment to get green)
-
     minikube service lifo
 
     (Take port and use curl)
+
+    minikube stop
+    minikube delete
 
 
 
 Extra usefull commands
 
-    docker 
 
     docker build -t lifo .
     docker network create lifo
@@ -49,12 +49,6 @@ Extra usefull commands
     --rm \
     --network=lifo mongo
 
-    docker run \
-    -
-    --name=postgres \
-    -e POSTGRES_PASSWORD=password \
-    --rm \
-    --network=lifo postgres
 
     docker run \
     --name=lifo \
@@ -67,25 +61,8 @@ Extra usefull commands
     docker stop mongo lifo
     docker images
     docker image rm -f a521dea276d8
+    docker system prune --all		remove everything
     docker ps
-
-
-    Kubernetes
-
-    docker login
-    docker tag lifo saransh98/lifo:1.0.0
-
-
-
-    minikube start
-    kubectl apply -f lifo
-    kubectl get service
-    kubectl get pods --watch
-    minikube service lifo
-
-    minikube stop
-    minikube delete
-    minikube dashboard
 
 
 

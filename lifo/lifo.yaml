@@ -26,12 +26,12 @@ spec:
     spec:
       containers:
         - name: lifo
-          image: saransh98/lifo:1.0.5
+          image: saransh98/lifo:1.0.6
           ports:
             - containerPort: 3000
           env:
             - name: MONGO_URL
               value: mongodb://mongo:27017/dev
             - name: HOST
-              value: '10.108.80.55'
+              value: postgres
           imagePullPolicy: Always
