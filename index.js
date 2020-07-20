@@ -4,6 +4,10 @@ const bodyParser = require('body-parser')
 const mongoDb = require('./mongo')
 const postgres = require('./postgres')
 
+const swagger_options = require('./swagger_def/swagger')
+const swaggerJsDoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
+
 const app = express()
 app.use(bodyParser());
 const port = process.env.PORT || 3000
@@ -65,6 +69,14 @@ async function start_server() {
             }
         }
     )
+
+    const swaggerSpec = swaggerJsDoc(swagger_options);
+    app.get('/swagger.json', (req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(swaggerSpec);
+        console.log("swaggerSpec", swaggerSpec)
+    });
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
     app.listen(port, () => {
         console.log(`App listening on http://localhost:${port}`)

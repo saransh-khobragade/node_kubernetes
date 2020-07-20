@@ -1,0 +1,65 @@
+path:
+  /push:
+    post:
+      summary: push
+      tags: [stack]
+      requestBody:
+        description: element
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                db_name:
+                  type: string
+                  required: true
+                  enum: [mongo,postgres]
+                element:
+                  type: number
+                  required: true
+                  example: 1
+        
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  inserted_row_count:
+                    type: number
+                    description: inserted_row_count
+  path:
+  /pop:
+    delete:
+      summary: pop
+      tags: [stack]
+      requestBody:
+        description: element
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                db_name:
+                  type: string
+                  required: true
+                  enum: [mongo,postgres]
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  poped_element:
+                    type: number
+                    description: poped_element
+                  
+                      
+
+  
