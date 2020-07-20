@@ -36,6 +36,8 @@ Run Kubernetes follow these commannd
     minikube stop
     minikube delete
 
+Swagger api:
+    http://localhost:3000/api-docs/
 
 
 Extra usefull commands
